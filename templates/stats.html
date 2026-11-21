@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Статистика — СпортПрокат{% endblock %}
+
+{% block content %}
+<section class="page-head wrap">
+  <p class="kicker kicker--dark">Аналитика</p>
+  <h1>Статистика сервиса</h1>
+  <p class="page-head__lead">Выручка, загрузка и популярность оборудования.</p>
+</section>
+
+<section class="wrap">
+  <div class="kpi-row kpi-row--4">
+    <div class="kpi"><span>Выручка за 6 месяцев</span><b>{{ kpi.revenue|money }}</b></div>
+    <div class="kpi"><span>Средний чек</span><b>{{ kpi.avg_check|money }}</b></div>
+    <div class="kpi"><span>Активных броней</span><b>{{ kpi.active }}</b></div>
+    <div class="kpi"><span>Клиентов</span><b>{{ kpi.clients }}</b></div>
+  </div>
+
+  <div class="charts">
+    <div class="chart-card chart-card--wide">
+      <h2>Выручка по месяцам</h2>
+      <p class="muted">Сумма по завершённым арендам, включая штрафы.</p>
+      {{ revenue_chart }}
+    </div>
+    <div class="chart-card">
+      <h2>Брони по статусам</h2>
+      <p class="muted">Текущее распределение заявок.</p>
+      {{ status_chart }}
+    </div>
+    <div class="chart-card">
+      <h2>Популярное оборудование</h2>
+      <p class="muted">Топ-6 позиций по числу аренд.</p>
+      {{ top_chart }}
+    </div>
+    <div class="chart-card">
+      <h2>Склад</h2>
+      <ul class="stat-list">
+        <li><span>Всего бронирований</span><b>{{ kpi.bookings }}</b></li>
+        <li><span>Единиц в ремонте и списано</span><b>{{ kpi.broken }}</b></li>
+        <li><span>Средний чек возврата</span><b>{{ kpi.avg_check|money }}</b></li>
+      </ul>
+    </div>
+  </div>
+</section>
+{% endblock %}

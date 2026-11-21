@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% from "macros.html" import equipment_card with context %}
+
+{% block content %}
+<section class="hero">
+  <div class="wrap hero__inner">
+    <div class="hero__text">
+      <p class="kicker">Прокат снаряжения · Москва</p>
+      <h1>Берите снаряжение.<br><span>Возвращайте впечатления.</span></h1>
+      <p class="hero__lead">
+        Спортивный инвентарь, туристическое снаряжение и строительная техника
+        в аренду на сутки. Онлайн-бронирование с проверкой свободных дат —
+        без звонков и очередей.
+      </p>
+      <div class="hero__actions">
+        <a class="btn btn--primary btn--lg" href="{{ url_for('catalog') }}">Смотреть каталог</a>
+        <a class="btn btn--ghost btn--lg" href="{{ url_for('index') }}#how">Как это работает</a>
+      </div>
+      <dl class="hero__stats">
+        <div><dt>{{ stats['items'] }}</dt><dd>позиций в каталоге</dd></div>
+        <div><dt>{{ stats['units'] }}</dt><dd>единиц на складе</dd></div>
+        <div><dt>{{ stats['bookings'] }}</dt><dd>бронирований</dd></div>
+      </dl>
+    </div>
+
+    <div class="hero__art" aria-hidden="true">
+      <div class="hero__ring"></div>
+      <div class="hero__tile hero__tile--1">🚲</div>
+      <div class="hero__tile hero__tile--2">⛺</div>
+      <div class="hero__tile hero__tile--3">🛠️</div>
+      <div class="hero__badge">
+        <span>от 300 ₽</span>
+        <small>за сутки</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="categories wrap">
+  {% for c in categories %}
+    <a class="category" href="{{ url_for('catalog', category=c.slug) }}">
+      <span class="category__icon">
+        {% if c.slug == 'sport' %}🚴
+        {% elif c.slug == 'tourism' %}🏕️
+        {% else %}🔧{% endif %}
+      </span>
+      <span class="category__name">{{ c.name }}</span>
+      <span class="category__desc">
+        {% if c.slug == 'sport' %}Велосипеды, самокаты, сноуборды
+        {% elif c.slug == 'tourism' %}Палатки, рюкзаки, SUP-борды
+        {% else %}Перфораторы, леса, генераторы{% endif %}
+      </span>
+      <span class="category__arrow">→</span>
+    </a>
+  {% endfor %}
+</section>
+
+<section class="section wrap">
+  <div class="section__head">
+    <div>
+      <p class="kicker kicker--dark">Популярное</p>
+      <h2>Чаще всего берут</h2>
+    </div>
+    <a class="link-arrow" href="{{ url_for('catalog') }}">Весь каталог →</a>
+  </div>
+  <div class="grid grid--3">
+    {% for item in popular %}
+      {{ equipment_card(item) }}
+    {% endfor %}
+  </div>
+</section>
+
+<section class="how" id="how">
+  <div class="wrap">
+    <div class="section__head">
+      <div>
+        <p class="kicker kicker--dark">Порядок работы</p>
+        <h2>Три шага до поездки</h2>
+      </div>
+    </div>
+    <ol class="steps">
+      <li class="step">
+        <span class="step__num">01</span>
+        <h3>Выберите даты</h3>
+        <p>Откройте карточку товара и укажите день получения и возврата — стоимость посчитается автоматически.</p>
+      </li>
+      <li class="step">
+        <span class="step__num">02</span>
+        <h3>Оформите бронь</h3>
+        <p>Добавьте снаряжение в корзину и отправьте заявку. Менеджер подтвердит её и проверит наличие.</p>
+      </li>
+      <li class="step">
+        <span class="step__num">03</span>
+        <h3>Заберите и верните</h3>
+        <p>Получите оборудование на складе, а по возвращении менеджер зафиксирует его состояние.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="cta wrap">
+  <div class="cta__box">
+    <div>
+      <h2>Не нашли нужное?</h2>
+      <p>В каталоге 12 позиций, но склад обновляется. Напишите нам — подберём аналог и забронируем на нужные даты.</p>
+    </div>
+    <div class="cta__actions">
+      <a class="btn btn--primary btn--lg" href="{{ url_for('catalog') }}">Перейти в каталог</a>
+      <a class="btn btn--ghost btn--lg" href="mailto:hello@sportrent.ru">Написать нам</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

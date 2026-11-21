@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Регистрация — СпортПрокат{% endblock %}
+
+{% block content %}
+<section class="auth auth--single wrap">
+  <div class="auth__card">
+    <h1>Регистрация</h1>
+    <p class="muted">Создайте аккаунт клиента, чтобы бронировать оборудование.</p>
+
+    <form method="post" class="stack" id="register-form">
+      <label class="field">
+        <span>Имя и фамилия</span>
+        <input type="text" name="name" value="{{ name }}" minlength="2" required autocomplete="name">
+      </label>
+      <label class="field">
+        <span>E-mail</span>
+        <input type="email" name="email" value="{{ email }}" required autocomplete="email">
+      </label>
+      <label class="field">
+        <span>Телефон</span>
+        <input type="tel" name="phone" value="{{ phone }}" placeholder="+7 900 000-00-00" required autocomplete="tel">
+      </label>
+      <div class="field-row">
+        <label class="field">
+          <span>Пароль</span>
+          <input type="password" name="password" id="password" minlength="6" required autocomplete="new-password">
+        </label>
+        <label class="field">
+          <span>Повторите пароль</span>
+          <input type="password" name="password2" id="password2" minlength="6" required autocomplete="new-password">
+        </label>
+      </div>
+      <p class="hint hint--error" id="password-error" hidden>Пароли не совпадают.</p>
+      <button class="btn btn--primary btn--block" type="submit">Создать аккаунт</button>
+    </form>
+
+    <p class="auth__switch">Уже есть аккаунт? <a href="{{ url_for('login') }}">Войти</a></p>
+  </div>
+</section>
+{% endblock %}

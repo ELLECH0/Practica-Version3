@@ -1,0 +1,23 @@
+{% macro equipment_card(item, free=None) %}
+<article class="card">
+  <a class="card__media" href="{{ url_for('product', equipment_id=item.id) }}">
+    <img src="{{ url_for('static', path='img/' ~ item.image) }}" alt="{{ item.name }}" loading="lazy">
+    <span class="card__cat">{{ item.category_name }}</span>
+    {% if free is not none %}
+      <span class="card__badge {{ 'card__badge--ok' if free > 0 else 'card__badge--no' }}">
+        {{ 'Свободно: ' ~ free if free > 0 else 'Нет на даты' }}
+      </span>
+    {% endif %}
+  </a>
+  <div class="card__body">
+    <h3 class="card__title">
+      <a href="{{ url_for('product', equipment_id=item.id) }}">{{ item.name }}</a>
+    </h3>
+    <p class="card__desc">{{ item.description|truncate(84, true, '…') }}</p>
+    <div class="card__foot">
+      <p class="price">{{ item.price_per_day|money }}<span>/ сутки</span></p>
+      <a class="btn btn--primary btn--sm" href="{{ url_for('product', equipment_id=item.id) }}">Выбрать даты</a>
+    </div>
+  </div>
+</article>
+{% endmacro %}

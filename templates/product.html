@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% from "macros.html" import equipment_card with context %}
+{% block title %}{{ item.name }} — СпортПрокат{% endblock %}
+
+{% block content %}
+<section class="wrap product">
+  <nav class="crumbs">
+    <a href="{{ url_for('index') }}">Главная</a>
+    <span>/</span>
+    <a href="{{ url_for('catalog', category=item.category_slug) }}">{{ item.category_name }}</a>
+    <span>/</span>
+    <span>{{ item.name }}</span>
+  </nav>
+
+  <div class="product__grid">
+    <div class="product__media">
+      <img src="{{ url_for('static', path='img/' ~ item.image) }}" alt="{{ item.name }}">
+      <span class="product__cat">{{ item.category_name }}</span>
+    </div>
+
+    <div class="product__info">
+      <h1>{{ item.name }}</h1>
+      <p class="product__desc">{{ item.description }}</p>
+
+      <div class="product__price">
+        <span class="price price--lg">{{ item.price_per_day|money }}<span>/ сутки</span></span>
+        <span class="product__deposit">Залог: {{ item.deposit|money }}</span>
+      </div>
+
+      <form class="booking-form" method="get" action="{{ url_for('product', equipment_id=item.id) }}">
+        <div class="field-row">
+          <label class="field">
+            <span>Дата получения</span>
+            <input type="date" name="date_from" min="{{ today }}" value="{{ date_from }}" required>
+          </label>
+          <label class="field">
+            <span>Дата возврата</span>
+            <input type="date" name="date_to" min="{{ today }}" value="{{ date_to }}" required>
+          </label>
+        </div>
+        <button class="btn btn--ghost" type="submit">Проверить доступность</button>
+      </form>
+
+      {% if date_error %}
+        <p class="notice notice--error">{{ date_error }}</p>
+      {% endif %}
+
+      {% if days %}
+        <div class="calc">
+          <div class="calc__row"><span>Срок аренды</span><b>{{ days }} {{ 'сутки' if days == 1 else ('суток' if days in (2,3,4) else 'суток') }}</b></div>
+          <div class="calc__row"><span>Свободно единиц</span>
+            <b class="{{ 'ok' if free > 0 else 'no' }}">{{ free if free > 0 else 'нет' }}</b>
+          </div>
+          <div class="calc__row calc__row--total"><span>Итого</span><b>{{ total|money }}</b></div>
+
+          {% if free > 0 %}
+            {% if g.user and g.user.role == 'client' %}
+              <form method="post" action="{{ url_for('cart_add') }}">
+                <input type="hidden" name="equipment_id" value="{{ item.id }}">
+                <input type="hidden" name="date_from" value="{{ date_from }}">
+                <input type="hidden" name="date_to" value="{{ date_to }}">
+                <button class="btn btn--primary btn--lg btn--block" type="submit">Добавить в корзину</button>
+              </form>
+              <p class="hint">Залог {{ item.deposit|money }} вносится при получении и возвращается после осмотра.</p>
+            {% elif g.user %}
+              <p class="notice notice--info">Бронирование доступно только клиентам. Вы вошли как {{ roles[g.user.role] }}.</p>
+            {% else %}
+              <a class="btn btn--primary btn--lg btn--block" href="{{ url_for('login', next=request.path) }}">Войти и забронировать</a>
+            {% endif %}
+          {% else %}
+            <p class="notice notice--error">На выбранные даты всё занято. Попробуйте другой период.</p>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <ul class="specs">
+        <li><span>Категория</span><b>{{ item.category_name }}</b></li>
+        <li><span>Единиц на складе</span><b>{{ item.qty_total }}</b></li>
+        <li><span>Выдача</span><b>Склад, ул. Тверская, 1</b></li>
+        <li><span>Проверка при выдаче</span><b>Да, вместе с менеджером</b></li>
+      </ul>
+    </div>
+  </div>
+
+  {% if similar %}
+    <div class="section__head section__head--mt">
+      <div><p class="kicker kicker--dark">Из той же категории</p><h2>Похожее снаряжение</h2></div>
+    </div>
+    <div class="grid grid--3">
+      {% for s in similar %}
+        <article class="card card--small">
+          <a class="card__media" href="{{ url_for('product', equipment_id=s.id) }}">
+            <img src="{{ url_for('static', path='img/' ~ s.image) }}" alt="{{ s.name }}" loading="lazy">
+          </a>
+          <div class="card__body">
+            <h3 class="card__title"><a href="{{ url_for('product', equipment_id=s.id) }}">{{ s.name }}</a></h3>
+            <div class="card__foot">
+              <p class="price">{{ s.price_per_day|money }}<span>/ сутки</span></p>
+              <a class="btn btn--ghost btn--sm" href="{{ url_for('product', equipment_id=s.id) }}">Открыть</a>
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

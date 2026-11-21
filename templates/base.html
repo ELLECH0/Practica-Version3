@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}СпортПрокат — аренда снаряжения{% endblock %}</title>
+  <meta name="description" content="Прокат спортивного, туристического и строительного оборудования с онлайн-бронированием.">
+  <link rel="icon" href="{{ url_for('static', path='img/favicon.svg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+</head>
+<body>
+
+<header class="head">
+  <div class="wrap head__inner">
+    <a class="brand" href="{{ url_for('index') }}">
+      <span class="brand__mark">СП</span>
+      <span class="brand__text">Спорт<em>Прокат</em></span>
+    </a>
+
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav" aria-label="Меню">Меню</button>
+
+    <nav class="nav" id="nav" aria-label="Основная навигация">
+      <a href="{{ url_for('catalog') }}">Каталог</a>
+      <a href="{{ url_for('index') }}#how">Как это работает</a>
+      {% if g.user and g.user.role == 'client' %}
+        <a href="{{ url_for('account') }}">Мои аренды</a>
+      {% endif %}
+      {% if g.user and g.user.role in ('manager', 'admin') %}
+        <a href="{{ url_for('manager') }}">Брони</a>
+        <a href="{{ url_for('warehouse') }}">Склад</a>
+        <a href="{{ url_for('stats') }}">Статистика</a>
+      {% endif %}
+      {% if g.user and g.user.role == 'admin' %}
+        <a href="{{ url_for('admin') }}">Админ-панель</a>
+      {% endif %}
+
+      <div class="nav__mobile">
+        {% if g.user %}
+          <span class="nav__who">{{ g.user.name }} · {{ roles[g.user.role] }}</span>
+          <a href="{{ url_for('account') if g.user.role == 'client' else url_for('manager') }}">Личный кабинет</a>
+          <a href="{{ url_for('logout') }}">Выйти</a>
+        {% else %}
+          <a href="{{ url_for('login') }}">Вход</a>
+          <a href="{{ url_for('register') }}">Регистрация</a>
+        {% endif %}
+      </div>
+    </nav>
+
+    <div class="head__side">
+      {% if g.user and g.user.role == 'client' %}
+        <a class="cart" href="{{ url_for('cart') }}" aria-label="Корзина, позиций: {{ cart_count }}">
+          <span class="cart__label">Корзина</span>
+          <span class="cart__count">{{ cart_count }}</span>
+        </a>
+      {% endif %}
+      {% if g.user %}
+        <a class="user" href="{{ url_for('account') if g.user.role == 'client' else url_for('manager') }}">
+          <span class="user__name">{{ g.user.name }}</span>
+          <span class="user__role">{{ roles[g.user.role] }}</span>
+        </a>
+        <a class="btn btn--ghost btn--sm" href="{{ url_for('logout') }}">Выйти</a>
+      {% else %}
+        <a class="btn btn--ghost btn--sm" href="{{ url_for('login') }}">Вход</a>
+        <a class="btn btn--primary btn--sm" href="{{ url_for('register') }}">Регистрация</a>
+      {% endif %}
+    </div>
+  </div>
+</header>
+
+{% with messages = flashes %}
+  {% if messages %}
+    <div class="wrap flashes">
+      {% for category, message in messages %}
+        <div class="flash flash--{{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<main class="main">
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__inner">
+    <div class="foot__brand">
+      <span class="brand__mark">СП</span>
+      <p>Сервис аренды спортивного, туристического и строительного оборудования. Учебный проект, 2026 год.</p>
+    </div>
+    <div class="foot__col">
+      <h4>Каталог</h4>
+      <a href="{{ url_for('catalog', category='sport') }}">Спорт</a>
+      <a href="{{ url_for('catalog', category='tourism') }}">Туризм</a>
+      <a href="{{ url_for('catalog', category='build') }}">Строительство</a>
+    </div>
+    <div class="foot__col">
+      <h4>Сервис</h4>
+      <a href="{{ url_for('index') }}#how">Как арендовать</a>
+      <a href="{{ url_for('catalog') }}">Наличие</a>
+      {% if g.user and g.user.role == 'client' %}
+        <a href="{{ url_for('account') }}">Личный кабинет</a>
+      {% else %}
+        <a href="{{ url_for('login') }}">Вход</a>
+      {% endif %}
+    </div>
+    <div class="foot__col">
+      <h4>Контакты</h4>
+      <a href="tel:+79000000000">+7 900 000-00-00</a>
+      <a href="mailto:hello@sportrent.ru">hello@sportrent.ru</a>
+      <span>Ежедневно, 8:00–22:00</span>
+    </div>
+  </div>
+  <div class="wrap foot__bottom">
+    <span>© {{ year }} СпортПрокат</span>
+    <span>Демонстрационный проект для курсовой работы</span>
+  </div>
+</footer>
+
+<script src="{{ url_for('static', path='js/main.js') }}"></script>
+</body>
+</html>

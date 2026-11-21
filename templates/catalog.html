@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% from "macros.html" import equipment_card with context %}
+{% block title %}Каталог — СпортПрокат{% endblock %}
+
+{% block content %}
+<section class="page-head wrap">
+  <p class="kicker kicker--dark">Каталог</p>
+  <h1>Оборудование в наличии</h1>
+  <p class="page-head__lead">Фильтруйте по категории, цене и датам. Если указать даты, карточки покажут, сколько единиц свободно.</p>
+</section>
+
+<section class="wrap catalog">
+  <aside class="filters">
+    <form method="get" action="{{ url_for('catalog') }}" class="filters__form">
+      <label class="field">
+        <span>Поиск</span>
+        <input type="search" name="q" value="{{ q }}" placeholder="Палатка, перфоратор…">
+      </label>
+
+      <fieldset class="field">
+        <legend>Категория</legend>
+        <div class="chips">
+          <label class="chip">
+            <input type="radio" name="category" value="" {% if not category %}checked{% endif %}>
+            <span>Все</span>
+          </label>
+          {% for c in categories %}
+            <label class="chip">
+              <input type="radio" name="category" value="{{ c.slug }}" {% if category == c.slug %}checked{% endif %}>
+              <span>{{ c.name }}</span>
+            </label>
+          {% endfor %}
+        </div>
+      </fieldset>
+
+      <div class="field-row">
+        <label class="field">
+          <span>Цена от, ₽</span>
+          <input type="number" name="price_min" min="0" step="50" value="{{ price_min }}" placeholder="0">
+        </label>
+        <label class="field">
+          <span>до, ₽</span>
+          <input type="number" name="price_max" min="0" step="50" value="{{ price_max }}" placeholder="3000">
+        </label>
+      </div>
+
+      <div class="field-row">
+        <label class="field">
+          <span>Нужно с</span>
+          <input type="date" name="date_from" min="{{ today }}" value="{{ date_from }}">
+        </label>
+        <label class="field">
+          <span>по</span>
+          <input type="date" name="date_to" min="{{ today }}" value="{{ date_to }}">
+        </label>
+      </div>
+
+      {% if date_error %}
+        <p class="hint hint--error">{{ date_error }}</p>
+      {% endif %}
+
+      <label class="field">
+        <span>Сортировка</span>
+        <select name="sort">
+          <option value="popular" {% if sort == 'popular' %}selected{% endif %}>По популярности</option>
+          <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Сначала дешевле</option>
+          <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Сначала дороже</option>
+          <option value="name" {% if sort == 'name' %}selected{% endif %}>По названию</option>
+        </select>
+      </label>
+
+      <div class="filters__actions">
+        <button class="btn btn--primary" type="submit">Применить</button>
+        <a class="btn btn--ghost" href="{{ url_for('catalog') }}">Сбросить</a>
+      </div>
+    </form>
+  </aside>
+
+  <div class="catalog__main">
+    <div class="catalog__bar">
+      <span>Найдено: <b>{{ items|length }}</b></span>
+      {% if date_from and date_to and not date_error %}
+        <span class="pill">Наличие на {{ date_from|rdate }} — {{ date_to|rdate }}</span>
+      {% endif %}
+    </div>
+
+    {% if items %}
+      <div class="grid grid--3">
+        {% for item in items %}
+          {{ equipment_card(item, item.free) }}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty">
+        <h3>Ничего не найдено</h3>
+        <p>Попробуйте изменить фильтры или сбросить их.</p>
+        <a class="btn btn--primary" href="{{ url_for('catalog') }}">Сбросить фильтры</a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

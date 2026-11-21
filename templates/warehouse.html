@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Склад — СпортПрокат{% endblock %}
+
+{% block content %}
+<section class="page-head wrap">
+  <p class="kicker kicker--dark">Склад</p>
+  <h1>Учёт оборудования</h1>
+  <p class="page-head__lead">Единицы, инвентарные номера, состояние, ремонт и списание.</p>
+</section>
+
+<section class="wrap">
+  <details class="panel">
+    <summary>Добавить единицу на склад</summary>
+    <form method="post" action="{{ url_for('unit_add') }}" class="inline-form inline-form--wide">
+      <label class="field">
+        <span>Оборудование</span>
+        <select name="equipment_id" required>
+          {% for e in equipment %}
+            <option value="{{ e.id }}">{{ e.name }} ({{ e.qty_total }})</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="field">
+        <span>Инвентарный номер</span>
+        <input type="text" name="inventory_no" placeholder="SP-013-05" required>
+      </label>
+      <label class="field">
+        <span>Состояние</span>
+        <select name="condition">
+          {% for key, label in conditions.items() %}
+            <option value="{{ key }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <button class="btn btn--primary" type="submit">Добавить</button>
+    </form>
+  </details>
+
+  <div class="tabs tabs--wrap">
+    <a class="tab {{ 'is-active' if not category }}" href="{{ url_for('warehouse') }}">Все</a>
+    {% for c in categories %}
+      <a class="tab {{ 'is-active' if category == c.slug }}" href="{{ url_for('warehouse', category=c.slug) }}">{{ c.name }}</a>
+    {% endfor %}
+  </div>
+
+  {% for e in equipment %}
+    <section class="warehouse-block">
+      <div class="warehouse-block__head">
+        <div>
+          <h2>{{ e.name }}</h2>
+          <p class="muted">{{ e.category_name }} · всего единиц: {{ e.qty_total }}</p>
+        </div>
+        <span class="pill">ID {{ e.id }}</span>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr><th>Инвентарный №</th><th>Состояние</th><th>Статус</th><th>Действия</th></tr>
+          </thead>
+          <tbody>
+            {% for u in grouped.get(e.id, []) %}
+              <tr>
+                <td><b>{{ u.inventory_no }}</b></td>
+                <td>{{ conditions[u.condition] }}</td>
+                <td><span class="status status--{{ u.status }}">{{ unit_statuses[u.status] }}</span></td>
+                <td>
+                  {% if u.status == 'rented' %}
+                    <span class="muted">В аренде</span>
+                  {% else %}
+                    <div class="row-actions">
+                      {% if u.status != 'repair' %}
+                        <form method="post" action="{{ url_for('unit_status', unit_id=u.id) }}">
+                          <input type="hidden" name="status" value="repair">
+                          <button class="btn btn--ghost btn--xs" type="submit">В ремонт</button>
+                        </form>
+                      {% endif %}
+                      {% if u.status != 'available' %}
+                        <form method="post" action="{{ url_for('unit_status', unit_id=u.id) }}">
+                          <input type="hidden" name="status" value="available">
+                          <button class="btn btn--ghost btn--xs" type="submit">На склад</button>
+                        </form>
+                      {% endif %}
+                      {% if u.status != 'written_off' %}
+                        <form method="post" action="{{ url_for('unit_status', unit_id=u.id) }}">
+                          <input type="hidden" name="status" value="written_off">
+                          <button class="btn btn--danger btn--xs" type="submit">Списать</button>
+                        </form>
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  {% endfor %}
+</section>
+{% endblock %}

@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block title %}Админ-панель — СпортПрокат{% endblock %}
+
+{% block content %}
+<section class="page-head wrap">
+  <p class="kicker kicker--dark">Администратор</p>
+  <h1>Управление сервисом</h1>
+  <p class="page-head__lead">Каталог, тарифы, категории и сотрудники.</p>
+</section>
+
+<section class="wrap">
+  <div class="tabs">
+    <a class="tab {{ 'is-active' if tab == 'equipment' }}" href="{{ url_for('admin', tab='equipment') }}">Каталог</a>
+    <a class="tab {{ 'is-active' if tab == 'categories' }}" href="{{ url_for('admin', tab='categories') }}">Категории</a>
+    <a class="tab {{ 'is-active' if tab == 'users' }}" href="{{ url_for('admin', tab='users') }}">Пользователи</a>
+  </div>
+
+  {% if tab == 'categories' %}
+    <div class="panel">
+      <h2>Новая категория</h2>
+      <form method="post" action="{{ url_for('admin_category_add') }}" class="inline-form">
+        <label class="field"><span>Название</span><input type="text" name="name" required></label>
+        <label class="field"><span>Код (латиницей)</span><input type="text" name="slug" pattern="[a-z0-9-]+" required></label>
+        <button class="btn btn--primary" type="submit">Добавить</button>
+      </form>
+    </div>
+
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>ID</th><th>Название</th><th>Код</th><th>Позиций</th><th></th></tr></thead>
+        <tbody>
+          {% for c in categories %}
+            <tr>
+              <td>{{ c.id }}</td>
+              <td><b>{{ c.name }}</b></td>
+              <td>{{ c.slug }}</td>
+              <td>{{ c.used }}</td>
+              <td>
+                <form method="post" action="{{ url_for('admin_category_delete', cat_id=c.id) }}"
+                      onsubmit="return confirm('Удалить категорию «{{ c.name }}»?')">
+                  <button class="btn btn--danger btn--xs" type="submit">Удалить</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  {% elif tab == 'users' %}
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>ID</th><th>Имя</th><th>E-mail</th><th>Телефон</th><th>Роль</th><th></th></tr></thead>
+        <tbody>
+          {% for u in users %}
+            <tr>
+              <td>{{ u.id }}</td>
+              <td><b>{{ u.name }}</b></td>
+              <td>{{ u.email }}</td>
+              <td>{{ u.phone }}</td>
+              <td>
+                {% if u.id == g.user.id %}
+                  <span class="pill">{{ roles[u.role] }}</span>
+                {% else %}
+                  <form method="post" action="{{ url_for('admin_user_role', user_id=u.id) }}" class="row-actions">
+                    <select name="role">
+                      {% for key, label in roles.items() %}
+                        <option value="{{ key }}" {% if u.role == key %}selected{% endif %}>{{ label }}</option>
+                      {% endfor %}
+                    </select>
+                    <button class="btn btn--ghost btn--xs" type="submit">Сохранить</button>
+                  </form>
+                {% endif %}
+              </td>
+              <td>
+                {% if u.id != g.user.id %}
+                  <form method="post" action="{{ url_for('admin_user_delete', user_id=u.id) }}"
+                        onsubmit="return confirm('Удалить пользователя {{ u.name }}?')">
+                    <button class="btn btn--danger btn--xs" type="submit">Удалить</button>
+                  </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  {% else %}
+    <details class="panel">
+      <summary>Добавить оборудование</summary>
+      <form method="post" action="{{ url_for('admin_equipment_save') }}" class="stack">
+        <div class="field-row">
+          <label class="field"><span>Название</span><input type="text" name="name" required></label>
+          <label class="field">
+            <span>Категория</span>
+            <select name="category_id" required>
+              {% for c in categories %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
+            </select>
+          </label>
+        </div>
+        <label class="field"><span>Описание</span><textarea name="description" rows="2"></textarea></label>
+        <div class="field-row">
+          <label class="field"><span>Цена за сутки, ₽</span><input type="number" name="price_per_day" min="1" required></label>
+          <label class="field"><span>Залог, ₽</span><input type="number" name="deposit" min="0" value="0"></label>
+          <label class="field"><span>Количество</span><input type="number" name="qty_total" min="1" value="1"></label>
+        </div>
+        <div class="field-row">
+          <label class="field"><span>Изображение</span><input type="text" name="image" value="box.svg" list="images"></label>
+          <label class="field field--check"><input type="checkbox" name="active" checked><span>Активно</span></label>
+        </div>
+        <datalist id="images">
+          <option value="bike.svg"><option value="scooter.svg"><option value="snowboard.svg">
+          <option value="tent.svg"><option value="sleeping.svg"><option value="backpack.svg">
+          <option value="sup.svg"><option value="kayak.svg"><option value="drill.svg">
+          <option value="mixer.svg"><option value="scaffold.svg"><option value="generator.svg">
+        </datalist>
+        <button class="btn btn--primary" type="submit">Сохранить</button>
+      </form>
+    </details>
+
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>ID</th><th>Название</th><th>Категория</th><th>Цена/сут.</th><th>Штук</th><th>Статус</th><th></th></tr></thead>
+        <tbody>
+          {% for e in equipment %}
+            <tr>
+              <td>{{ e.id }}</td>
+              <td><b>{{ e.name }}</b></td>
+              <td>{{ e.category_name }}</td>
+              <td>{{ e.price_per_day|money }}</td>
+              <td>{{ e.qty_total }}</td>
+              <td><span class="status status--{{ 'returned' if e.active else 'cancelled' }}">{{ 'В каталоге' if e.active else 'Скрыто' }}</span></td>
+              <td>
+                <div class="row-actions">
+                  <details class="edit">
+                    <summary class="btn btn--ghost btn--xs">Изменить</summary>
+                    <form method="post" action="{{ url_for('admin_equipment_save') }}" class="edit__form">
+                      <input type="hidden" name="id" value="{{ e.id }}">
+                      <label class="field"><span>Название</span><input type="text" name="name" value="{{ e.name }}" required></label>
+                      <div class="field-row">
+                        <label class="field"><span>Цена</span><input type="number" name="price_per_day" value="{{ e.price_per_day }}" min="1" required></label>
+                        <label class="field"><span>Залог</span><input type="number" name="deposit" value="{{ e.deposit }}" min="0"></label>
+                        <label class="field"><span>Штук</span><input type="number" name="qty_total" value="{{ e.qty_total }}" min="1"></label>
+                      </div>
+                      <label class="field"><span>Категория</span>
+                        <select name="category_id">
+                          {% for c in categories %}
+                            <option value="{{ c.id }}" {% if c.id == e.category_id %}selected{% endif %}>{{ c.name }}</option>
+                          {% endfor %}
+                        </select>
+                      </label>
+                      <label class="field"><span>Описание</span><textarea name="description" rows="2">{{ e.description }}</textarea></label>
+                      <label class="field"><span>Изображение</span><input type="text" name="image" value="{{ e.image }}" list="images"></label>
+                      <label class="field field--check"><input type="checkbox" name="active" {% if e.active %}checked{% endif %}><span>Активно</span></label>
+                      <button class="btn btn--primary btn--sm" type="submit">Сохранить</button>
+                    </form>
+                  </details>
+                  <form method="post" action="{{ url_for('admin_equipment_delete', eq_id=e.id) }}"
+                        onsubmit="return confirm('Удалить «{{ e.name }}»?')">
+                    <button class="btn btn--danger btn--xs" type="submit">Удалить</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Вход — СпортПрокат{% endblock %}
+
+{% block content %}
+<section class="auth wrap">
+  <div class="auth__card">
+    <h1>Вход в аккаунт</h1>
+    <p class="muted">Управляйте бронями и историей аренд.</p>
+
+    <form method="post" class="stack">
+      <label class="field">
+        <span>E-mail</span>
+        <input type="email" name="email" value="{{ email }}" autocomplete="email" required>
+      </label>
+      <label class="field">
+        <span>Пароль</span>
+        <input type="password" name="password" autocomplete="current-password" required>
+      </label>
+      <button class="btn btn--primary btn--block" type="submit">Войти</button>
+    </form>
+
+    <p class="auth__switch">Нет аккаунта? <a href="{{ url_for('register') }}">Зарегистрироваться</a></p>
+  </div>
+
+  <aside class="auth__demo">
+    <h2>Демо-доступы</h2>
+    <p>Для проверки ролей на защите проекта:</p>
+    <ul>
+      <li><b>Клиент</b><span>client@rent.ru / client123</span></li>
+      <li><b>Менеджер</b><span>manager@rent.ru / manager123</span></li>
+      <li><b>Администратор</b><span>admin@rent.ru / admin123</span></li>
+    </ul>
+  </aside>
+</section>
+{% endblock %}

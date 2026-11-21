@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Рабочее место менеджера — СпортПрокат{% endblock %}
+
+{% block content %}
+<section class="page-head wrap">
+  <p class="kicker kicker--dark">Менеджер</p>
+  <h1>Бронирования</h1>
+  <p class="page-head__lead">Подтверждение заявок, выдача и приём оборудования с фиксацией состояния.</p>
+</section>
+
+<section class="wrap">
+  <div class="tabs">
+    <a class="tab {{ 'is-active' if status == 'active' }}" href="{{ url_for('manager', status='active') }}">Активные</a>
+    <a class="tab {{ 'is-active' if status == 'pending' }}" href="{{ url_for('manager', status='pending') }}">Ожидают ({{ counts.get('pending', 0) }})</a>
+    <a class="tab {{ 'is-active' if status == 'issued' }}" href="{{ url_for('manager', status='issued') }}">Выдано ({{ counts.get('issued', 0) }})</a>
+    <a class="tab {{ 'is-active' if status == 'returned' }}" href="{{ url_for('manager', status='returned') }}">Возвращено</a>
+    <a class="tab {{ 'is-active' if status == 'overdue' }}" href="{{ url_for('manager', status='overdue') }}">Просрочено ({{ counts.get('overdue', 0) }})</a>
+  </div>
+
+  {% if bookings %}
+    <div class="manager-list">
+      {% for b in bookings %}
+        <article class="manager-card">
+          <div class="manager-card__main">
+            <div class="manager-card__top">
+              <h3>№{{ b.id }} · {{ b.name }}</h3>
+              <span class="status status--{{ b.status }}">{{ statuses[b.status] }}</span>
+            </div>
+            <p class="muted">
+              {{ b.client_name }} · {{ b.client_phone }} · заявка от {{ b.created_at|datetime }}
+            </p>
+            <p class="manager-card__dates">
+              {{ b.start_date|rdate }} — {{ b.end_date|rdate }} · {{ b.days }} сут. ·
+              <b>{{ b.total_price|money }}</b>
+              {% if b.penalty %} · штраф {{ b.penalty|money }}{% endif %}
+            </p>
+            {% if b.condition_out %}
+              <p class="muted">Состояние при выдаче: {{ conditions[b.condition_out] }}
+                {% if b.condition_in %} · при возврате: {{ conditions[b.condition_in] }}{% endif %}</p>
+            {% endif %}
+          </div>
+
+          <div class="manager-card__actions">
+            {% if b.status == 'pending' %}
+              <form method="post" action="{{ url_for('manager_confirm', booking_id=b.id) }}">
+                <button class="btn btn--primary btn--sm" type="submit">Подтвердить</button>
+              </form>
+            {% elif b.status == 'confirmed' %}
+              <form class="inline-form" method="post" action="{{ url_for('manager_issue', booking_id=b.id) }}">
+                <label class="field field--compact">
+                  <span>Состояние при выдаче</span>
+                  <select name="condition_out">
+                    {% for key, label in conditions.items() %}
+                      <option value="{{ key }}">{{ label }}</option>
+                    {% endfor %}
+                  </select>
+                </label>
+                <button class="btn btn--primary btn--sm" type="submit">Выдать</button>
+              </form>
+            {% elif b.status in ('issued', 'overdue') %}
+              <form class="inline-form" method="post" action="{{ url_for('manager_return', booking_id=b.id) }}">
+                <label class="field field--compact">
+                  <span>Состояние при возврате</span>
+                  <select name="condition_in">
+                    {% for key, label in conditions.items() %}
+                      <option value="{{ key }}">{{ label }}</option>
+                    {% endfor %}
+                  </select>
+                </label>
+                <label class="field field--compact">
+                  <span>Штраф, ₽</span>
+                  <input type="number" name="penalty" min="0" step="50" value="0">
+                </label>
+                <button class="btn btn--primary btn--sm" type="submit">Принять</button>
+              </form>
+            {% else %}
+              <span class="muted">Завершено</span>
+            {% endif %}
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty"><h3>Заявок нет</h3><p>В этой категории пока ничего нет.</p></div>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Корзина — СпортПрокат{% endblock %}
+
+{% block content %}
+<section class="page-head wrap">
+  <p class="kicker kicker--dark">Бронирование</p>
+  <h1>Корзина</h1>
+  <p class="page-head__lead">Проверьте даты и состав заказа. Заявка уйдёт менеджеру на подтверждение.</p>
+</section>
+
+<section class="wrap cart-page">
+  {% if items %}
+    <div class="cart-list">
+      {% for item in items %}
+        <article class="cart-item">
+          <img src="{{ url_for('static', path='img/' ~ item.image) }}" alt="{{ item.name }}">
+          <div class="cart-item__body">
+            <h3><a href="{{ url_for('product', equipment_id=item.equipment_id) }}">{{ item.name }}</a></h3>
+            <p class="muted">{{ item.start_date|rdate }} — {{ item.end_date|rdate }} · {{ item.days }} сут.</p>
+            <p class="cart-item__sum">{{ item.sum|money }}</p>
+          </div>
+          <div class="cart-item__side">
+            <span class="pill {{ 'pill--ok' if item.free >= item.qty else 'pill--no' }}">
+              {{ 'Свободно: ' ~ item.free if item.free > 0 else 'Нет в наличии' }}
+            </span>
+            <form method="post" action="{{ url_for('cart_delete', item_id=item.id) }}">
+              <button class="btn btn--ghost btn--sm" type="submit">Удалить</button>
+            </form>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+
+    <aside class="cart-summary">
+      <h2>Итого</h2>
+      <div class="calc__row"><span>Аренда</span><b>{{ total|money }}</b></div>
+      <div class="calc__row"><span>Залог</span><b>{{ (items|sum(attribute='deposit'))|money }}</b></div>
+      <div class="calc__row calc__row--total"><span>К оплате при получении</span><b>{{ total|money }}</b></div>
+      <p class="hint">Залог возвращается после проверки состояния оборудования.</p>
+
+      {% if problems %}
+        <div class="notice notice--error">
+          {% for p in problems %}<p>{{ p }}</p>{% endfor %}
+        </div>
+        <a class="btn btn--ghost btn--block" href="{{ url_for('catalog') }}">Изменить даты в каталоге</a>
+      {% else %}
+        <form method="post" action="{{ url_for('checkout') }}">
+          <button class="btn btn--primary btn--lg btn--block" type="submit">Оформить бронь</button>
+        </form>
+        <a class="btn btn--ghost btn--block" href="{{ url_for('catalog') }}">Добавить ещё</a>
+      {% endif %}
+    </aside>
+  {% else %}
+    <div class="empty">
+      <h3>Корзина пуста</h3>
+      <p>Выберите снаряжение в каталоге, укажите даты — и оно появится здесь.</p>
+      <a class="btn btn--primary" href="{{ url_for('catalog') }}">В каталог</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

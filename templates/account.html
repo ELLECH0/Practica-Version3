@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Личный кабинет — СпортПрокат{% endblock %}
+
+{% block content %}
+<section class="page-head wrap">
+  <p class="kicker kicker--dark">Личный кабинет</p>
+  <h1>{{ g.user.name }}</h1>
+  <p class="page-head__lead">{{ g.user.email }} · {{ g.user.phone }}</p>
+</section>
+
+<section class="wrap">
+  <div class="kpi-row">
+    <div class="kpi"><span>Активные брони</span><b>{{ active|length }}</b></div>
+    <div class="kpi"><span>Всего аренд</span><b>{{ bookings|length }}</b></div>
+    <div class="kpi"><span>Потрачено</span><b>{{ spent|money }}</b></div>
+  </div>
+
+  <div class="section__head section__head--mt">
+    <div><h2>Текущие и предстоящие</h2></div>
+  </div>
+
+  {% if active %}
+    <div class="booking-cards">
+      {% for b in active %}
+        <article class="booking-card">
+          <img src="{{ url_for('static', path='img/' ~ b.image) }}" alt="{{ b.name }}">
+          <div class="booking-card__body">
+            <div class="booking-card__top">
+              <h3>{{ b.name }}</h3>
+              <span class="status status--{{ b.status }}">{{ statuses[b.status] }}</span>
+            </div>
+            <p class="muted">Заявка №{{ b.id }} от {{ b.created_at|datetime }}</p>
+            <p class="booking-card__dates">{{ b.start_date|rdate }} — {{ b.end_date|rdate }} · {{ b.days }} сут.</p>
+            <p class="booking-card__sum">{{ b.total_price|money }}{% if b.penalty %} + штраф {{ b.penalty|money }}{% endif %}</p>
+          </div>
+          <div class="booking-card__side">
+            {% if b.status in ('pending', 'confirmed') %}
+              <form method="post" action="{{ url_for('booking_cancel', booking_id=b.id) }}"
+                    onsubmit="return confirm('Отменить бронирование №{{ b.id }}?')">
+                <button class="btn btn--ghost btn--sm" type="submit">Отменить</button>
+              </form>
+            {% endif %}
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty empty--sm">
+      <p>Активных броней нет. <a href="{{ url_for('catalog') }}">Выбрать снаряжение</a></p>
+    </div>
+  {% endif %}
+
+  <div class="section__head section__head--mt">
+    <div><h2>История аренд</h2></div>
+  </div>
+
+  {% if history %}
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>№</th><th>Оборудование</th><th>Даты</th><th>Сумма</th>
+            <th>Штраф</th><th>Состояние</th><th>Статус</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in history %}
+            <tr>
+              <td>{{ b.id }}</td>
+              <td>{{ b.name }}</td>
+              <td>{{ b.start_date|rdate }} — {{ b.end_date|rdate }}</td>
+              <td>{{ b.total_price|money }}</td>
+              <td>{{ b.penalty|money if b.penalty else '—' }}</td>
+              <td>{{ conditions[b.condition_in] if b.condition_in else '—' }}</td>
+              <td><span class="status status--{{ b.status }}">{{ statuses[b.status] }}</span></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="empty empty--sm"><p>История пока пуста.</p></div>
+  {% endif %}
+</section>
+{% endblock %}
