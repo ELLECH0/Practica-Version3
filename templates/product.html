@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% from "macros.html" import equipment_card with context %}
-{% block title %}{{ item.name }} — СпортПрокат{% endblock %}
+{% block title %}{{ item.name }} СпортПрокат{% endblock %}
 
 {% block content %}
 <section class="wrap product">
@@ -61,14 +61,14 @@
                 <input type="hidden" name="date_to" value="{{ date_to }}">
                 <button class="btn btn--primary btn--lg btn--block" type="submit">Добавить в корзину</button>
               </form>
-              <p class="hint">Залог {{ item.deposit|money }} вносится при получении и возвращается после осмотра.</p>
+              <p class="hint">Залог {{ item.deposit|money }} вносится при получении и возвращается после осмотра</p>
             {% elif g.user %}
               <p class="notice notice--info">Бронирование доступно только клиентам. Вы вошли как {{ roles[g.user.role] }}.</p>
             {% else %}
               <a class="btn btn--primary btn--lg btn--block" href="{{ url_for('login', next=request.path) }}">Войти и забронировать</a>
             {% endif %}
           {% else %}
-            <p class="notice notice--error">На выбранные даты всё занято. Попробуйте другой период.</p>
+            <p class="notice notice--error">На выбранные даты всё занято. Попробуйте другой период</p>
           {% endif %}
         </div>
       {% endif %}

@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %}Админ-панель — СпортПрокат{% endblock %}
+{% block title %}Админ-панель СпортПрокат{% endblock %}
 
 {% block content %}
 <section class="page-head wrap">
   <p class="kicker kicker--dark">Администратор</p>
   <h1>Управление сервисом</h1>
-  <p class="page-head__lead">Каталог, тарифы, категории и сотрудники.</p>
+  <p class="page-head__lead">Каталог, тарифы, категории и сотрудники</p>
 </section>
 
 <section class="wrap">
@@ -102,7 +102,7 @@
         <label class="field"><span>Описание</span><textarea name="description" rows="2"></textarea></label>
         <div class="field-row">
           <label class="field"><span>Цена за сутки, ₽</span><input type="number" name="price_per_day" min="1" required></label>
-          <label class="field"><span>Залог, ₽</span><input type="number" name="deposit" min="0" value="0"></label>
+          <label class="field"><span>Залог, рублей</span><input type="number" name="deposit" min="0" value="0"></label>
           <label class="field"><span>Количество</span><input type="number" name="qty_total" min="1" value="1"></label>
         </div>
         <div class="field-row">

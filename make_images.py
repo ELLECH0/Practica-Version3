@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-"""Генератор SVG-иллюстраций каталога (без внешних зависимостей)."""
 import os
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "img")

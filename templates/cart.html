@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %}Корзина — СпортПрокат{% endblock %}
+{% block title %}Корзина СпортПрокат{% endblock %}
 
 {% block content %}
 <section class="page-head wrap">
   <p class="kicker kicker--dark">Бронирование</p>
   <h1>Корзина</h1>
-  <p class="page-head__lead">Проверьте даты и состав заказа. Заявка уйдёт менеджеру на подтверждение.</p>
+  <p class="page-head__lead">Проверьте даты и состав заказа. Заявка уйдёт менеджеру на подтверждение</p>
 </section>
 
 <section class="wrap cart-page">
@@ -36,7 +36,7 @@
       <div class="calc__row"><span>Аренда</span><b>{{ total|money }}</b></div>
       <div class="calc__row"><span>Залог</span><b>{{ (items|sum(attribute='deposit'))|money }}</b></div>
       <div class="calc__row calc__row--total"><span>К оплате при получении</span><b>{{ total|money }}</b></div>
-      <p class="hint">Залог возвращается после проверки состояния оборудования.</p>
+      <p class="hint">Залог возвращается после проверки состояния оборудования</p>
 
       {% if problems %}
         <div class="notice notice--error">
@@ -53,7 +53,7 @@
   {% else %}
     <div class="empty">
       <h3>Корзина пуста</h3>
-      <p>Выберите снаряжение в каталоге, укажите даты — и оно появится здесь.</p>
+      <p>Выберите снаряжение в каталоге, укажите даты и оно появится здесь</p>
       <a class="btn btn--primary" href="{{ url_for('catalog') }}">В каталог</a>
     </div>
   {% endif %}

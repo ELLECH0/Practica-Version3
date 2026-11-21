@@ -1,7 +1,3 @@
-"""
-СпортПрокат — версия на FastAPI + SQLite + Jinja2.
-Запуск: python -m uvicorn main:app --reload
-"""
 import os
 import sqlite3
 from datetime import date, datetime, timedelta

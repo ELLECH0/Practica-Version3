@@ -1,9 +1,6 @@
-/* СпортПрокат — клиентские скрипты */
-
 (function () {
   "use strict";
 
-  /* --- Мобильное меню -------------------------------------------------- */
   var toggle = document.querySelector(".nav-toggle");
   var nav = document.getElementById("nav");
 
@@ -25,7 +22,6 @@
     });
   }
 
-  /* --- Проверка совпадения паролей при регистрации --------------------- */
   var form = document.getElementById("register-form");
   if (form) {
     var pwd = document.getElementById("password");
@@ -57,7 +53,6 @@
     });
   }
 
-  /* --- Даты: минимум — сегодня, возврат не раньше получения ------------ */
   var pairs = document.querySelectorAll(".booking-form .field-row, .filters__form .field-row");
 
   function isoToday() {
@@ -89,7 +84,6 @@
     });
   });
 
-  /* --- Подсчёт стоимости на карточке товара ---------------------------- */
   var calc = document.querySelector(".booking-form");
   if (calc) {
     var priceNode = document.querySelector(".product__price .price");
